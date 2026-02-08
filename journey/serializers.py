@@ -13,23 +13,23 @@ class MomFeelingSerializer(serializers.ModelSerializer):
         fields = ['week', 'feeling_state']
 
 class BabyDataSerializer(serializers.Serializer):
-    week_number = serializers.IntegerField(source='week_number')
-    baby_image = serializers.URLField(source='baby_image')
-    baby_size = serializers.FloatField(source='baby_size')
-    baby_weight = serializers.FloatField(source='baby_weight')
-    baby_analogy = serializers.CharField(source='baby_analogy')
-    baby_activity = serializers.CharField(source='baby_activity')
-    baby_development = serializers.CharField(source='baby_development')
-    interesting_fact = serializers.CharField(source='interesting_fact')
+    week_number = serializers.IntegerField()
+    baby_image = serializers.URLField()
+    baby_size = serializers.FloatField()
+    baby_weight = serializers.FloatField()
+    baby_analogy = serializers.CharField()
+    baby_activity = serializers.CharField()
+    baby_development = serializers.CharField()
+    interesting_fact = serializers.CharField()
 
 class MomDataSerializer(serializers.Serializer):
-    weekNumber = serializers.IntegerField()  # ✅ No source='week_number'
+    week_number = serializers.IntegerField()  # ✅ No source='week_number'
     feelingsStates = serializers.SerializerMethodField()
-    sensationDescr = serializers.CharField(source='daily_tip')  # ✅ Different name OK
-    comfortTips = ComfortTipSerializer(many=True)
+    sensationDescr = serializers.CharField(source='mom_daily_tips')
+    comfortTips = ComfortTipSerializer(many=True, source='comfort_tips')
 
     def get_feelingsStates(self, obj):
-        return [f.feeling_state for f in obj.mom_feelings.all()]  # ✅ Fixed relation
+        return [f.feeling_state for f in obj.mom_feelings.all()]
 
 class FullWeekDataSerializer(serializers.Serializer):
     week_number = serializers.IntegerField()

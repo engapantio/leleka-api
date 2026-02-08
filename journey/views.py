@@ -8,10 +8,6 @@ from .models import WeekData
 from .serializers import BabyDataSerializer, MomDataSerializer, FullWeekDataSerializer
 
 
-def test_api(request):
-    return JsonResponse({'status': 'journey API working', 'data_loaded': WeekData.objects.count()})
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_current_week(request):
@@ -33,6 +29,7 @@ def get_week_full_data(request, week_number):
     except WeekData.DoesNotExist:
         return Response({'error': 'Week not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_baby_state(request, week_number):
@@ -43,6 +40,7 @@ def get_baby_state(request, week_number):
         return Response(serializer.data)
     except WeekData.DoesNotExist:
         return Response({'error': 'Week not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -55,10 +53,3 @@ def get_mom_state(request, week_number):
     except WeekData.DoesNotExist:
         return Response({'error': 'Week not found'}, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['GET'])
-def debug_api(request):
-    return Response({
-        'all_patterns': [p.pattern.regex.pattern for p in request.resolver_match.url_name_namespace],
-        'current_path': request.path,
-        'query_params': dict(request.query_params)
-    })

@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+
     def create_superuser(self, email, name, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -23,27 +23,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('boy', 'Boy'),
         ('girl', 'Girl'),
     ]
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     gender = models.CharField(max_length=4, choices=GENDER_CHOICES, null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
-    avatar_url = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    
+    avatar_url = models.URLField(max_length=500, blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     objects = UserManager()
-    
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
-    
+
     def __str__(self):
         return self.email
-    
+
     @property
     def current_week(self):
         """Calculate pregnancy week based on due date"""

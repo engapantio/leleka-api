@@ -5,12 +5,18 @@ from decouple import config
 import os
 import dj_database_url
 from dotenv import load_dotenv
+import cloudinary
+import cloudinary.uploader
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='my-secret-key')
+SECRET_KEY = config(os.getenv('SECRET_KEY'), default='my-secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your-domain.com']
 
@@ -102,13 +108,16 @@ AUTH_USER_MODEL = 'users.User'
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.auth.CsrfExemptSessionAuthentication',
     ),
      'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',  # JSON only
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FileUploadParser',
     ],
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -119,7 +128,7 @@ REST_FRAMEWORK = {
 
 # JWT Settings (matching your current token system)
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -148,3 +157,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+)
