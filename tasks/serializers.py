@@ -5,12 +5,12 @@ from .models import Task
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'date', 'isDone', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
-    
+
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
 class TaskStatusUpdateSerializer(serializers.Serializer):
-    status = serializers.ChoiceField(choices=['pending', 'completed'])
+    isDone = serializers.ChoiceField(choices=[False, True])

@@ -1,4 +1,6 @@
 # diaries/views.py
+from rest_framework.generics import ListCreateAPIView
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -14,19 +16,36 @@ from .serializers import DiaryEntrySerializer
 #         OpenApiExample('Empty', value={'entries': []}, status_code=200),
 #     ]
 # )
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def diary_list_create(request):
-    if request.method == 'GET':
-        entries = DiaryEntry.objects.filter(user=request.user)
-        serializer = DiaryEntrySerializer(entries, many=True)
-        return Response({'entries': serializer.data})
+class DiaryListCreateView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DiaryEntrySerializer  # Assuming from your serializers.py[file:7]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['date']
 
-    elif request.method == 'POST':
-        serializer = DiaryEntrySerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get_queryset(self):
+        return DiaryEntry.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+
+# @api_view(['GET', 'POST'])
+# @permission_classes([IsAuthenticated])
+# def diary_list_create(request):
+#     if request.method == 'GET':
+#         entries = DiaryEntry.objects.filter(user=request.user)
+#         serializer = DiaryEntrySerializer(entries, many=True)
+#         return Response({'entries': serializer.data})
+
+#     elif request.method == 'POST':
+#         serializer = DiaryEntrySerializer(data=request.data, context={'request': request})
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
 
 # @extend_schema(
 #     request=DiaryEntrySerializer,  # Request schema
