@@ -10,30 +10,34 @@ class ComfortTipSerializer(serializers.ModelSerializer):
 class MomFeelingSerializer(serializers.ModelSerializer):
     class Meta:
         model = MomFeeling
-        fields = ['week', 'feeling_state']
+        fields = ['weekNumber', 'feelingState']
 
 class BabyDataSerializer(serializers.Serializer):
-    week_number = serializers.IntegerField()
-    baby_image = serializers.URLField()
-    baby_size = serializers.FloatField()
-    baby_weight = serializers.FloatField()
-    baby_analogy = serializers.CharField()
-    baby_activity = serializers.CharField()
-    baby_development = serializers.CharField()
-    interesting_fact = serializers.CharField()
+    weekNumber = serializers.IntegerField()
+    image = serializers.URLField()
+    babySize = serializers.FloatField()
+    babyWeight = serializers.FloatField()
+    analogy = serializers.CharField()
+    babyActivity = serializers.CharField()
+    babyDevelopment = serializers.CharField()
+    interestingFact = serializers.CharField()
+    momDailyTips = serializers.SerializerMethodField()
+
+    def get_momDailyTips(self, obj):
+        return getattr(obj, 'momDailyTips', [])
 
 class MomDataSerializer(serializers.Serializer):
-    week_number = serializers.IntegerField()  # ✅ No source='week_number'
+    weekNumber = serializers.IntegerField()
     feelingsStates = serializers.SerializerMethodField()
-    sensationDescr = serializers.CharField(source='mom_daily_tips')
-    comfortTips = ComfortTipSerializer(many=True, source='comfort_tips')
+    sensationDescr = serializers.CharField()
+    comfortTips = ComfortTipSerializer(many=True)
 
     def get_feelingsStates(self, obj):
-        return [f.feeling_state for f in obj.mom_feelings.all()]
+        return [f.feelingState for f in obj.momFeelings.all()]
 
 class FullWeekDataSerializer(serializers.Serializer):
-    week_number = serializers.IntegerField()
-    days_to_childbirth = serializers.IntegerField()
+    weekNumber = serializers.IntegerField()
+    daysToChildbirth = serializers.IntegerField()
 
     # ✅ Extract baby fields directly from WeekData
     baby = serializers.SerializerMethodField()
@@ -42,19 +46,21 @@ class FullWeekDataSerializer(serializers.Serializer):
 
     def get_baby(self, obj):
         return {
-            'week_number': obj.week_number,
-            'baby_image': obj.baby_image,
-            'baby_size': obj.baby_size,
-            'baby_weight': obj.baby_weight,
-            'baby_analogy': obj.baby_analogy,
-            'baby_activity': obj.baby_activity,
-            'baby_development': obj.baby_development,
-            'interesting_fact': obj.interesting_fact,
+            'weekNumber': obj.weekNumber,
+            'image': obj.image,
+            'babySize': obj.babySize,
+            'babyWeight': obj.babyWeight,
+            'analogy': obj.analogy,
+            'babyActivity': obj.babyActivity,
+            'babyDevelopment': obj.babyDevelopment,
+            'interestingFact': obj.interestingFact,
         }
 
     def get_momTip(self, obj):
+        mom_tips = getattr(obj, 'momDailyTips', [])
+        daily_tip = mom_tips[0] if mom_tips else "No tips available"
         return {
-            'dailyTip': getattr(obj, 'daily_tip', None),
-            'comfortTip': ComfortTipSerializer(obj.comfort_tips.first()).data
-                         if hasattr(obj, 'comfort_tips') and obj.comfort_tips.exists() else None
+            'dailyTip': daily_tip,
+            'comfortTip': ComfortTipSerializer(obj.comfortTips.first()).data
+                         if hasattr(obj, 'comfortTips') and obj.comfortTips.exists() else None
         }

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 from .models import DiaryEntry, Emotion
-from .serializers import DiaryEntrySerializer
+from .serializers import DiaryEntrySerializer, EmotionSerializer
 
 # @extend_schema(
 #     responses={200: OpenApiTypes.OBJECT},  # {'entries': DiaryEntrySerializer(many=True)}
@@ -18,15 +18,21 @@ from .serializers import DiaryEntrySerializer
 # )
 class DiaryListCreateView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = DiaryEntrySerializer  # Assuming from your serializers.py[file:7]
+    serializer_class = DiaryEntrySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['date']
+    pagination_class = None
 
     def get_queryset(self):
         return DiaryEntry.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"entries": serializer.data})
 
 
 
@@ -102,3 +108,14 @@ def get_emotions_list(request):
     from .models import Emotion
     emotions = Emotion.objects.values('id', 'title')
     return Response({'emotions': list(emotions)})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def emotion_detail(request, id):
+    try:
+        emotion = Emotion.objects.get(id=id)
+        serializer = EmotionSerializer(emotion)
+        return Response(serializer.data)
+    except Emotion.DoesNotExist:
+        return Response({'error': 'Emotion not found'}, status=status.HTTP_404_NOT_FOUND)

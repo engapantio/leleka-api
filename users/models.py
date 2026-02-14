@@ -28,13 +28,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     gender = models.CharField(max_length=4, choices=GENDER_CHOICES, null=True, blank=True)
-    due_date = models.DateField(null=True, blank=True)
-    avatar_url = models.URLField(max_length=500, blank=True, null=True)
+    dueDate = models.DateField(null=True, blank=True)
+    avatarUrl = models.URLField(max_length=500, blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
 
@@ -47,10 +47,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def current_week(self):
         """Calculate pregnancy week based on due date"""
-        if not self.due_date:
+        if not self.dueDate:
             return None
         from datetime import date
         today = date.today()
-        days_until_due = (self.due_date - today).days
+        days_until_due = (self.dueDate - today).days
         pregnancy_days = 280 - days_until_due  # 40 weeks = 280 days
         return max(1, min(40, pregnancy_days // 7 + 1))

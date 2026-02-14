@@ -14,9 +14,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config(os.getenv('SECRET_KEY'), default='my-secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your-domain.com']
 
@@ -42,6 +39,14 @@ INSTALLED_APPS = [
     'diaries',
     'tasks',
 ]
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 
 LOGGING = {
     'version': 1,
@@ -111,6 +116,7 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.auth.CsrfExemptSessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
      'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',  # JSON only

@@ -14,12 +14,13 @@ class DiaryEntrySerializer(serializers.ModelSerializer):
         write_only=True,  # POST: IDs
         required=False
     )
+    userId = serializers.UUIDField(source='user_id', read_only=True)
     # emotions = serializers.SerializerMethodField()  # Override for GET: objects
     class Meta:
         model = DiaryEntry
-        fields = ['id', 'date', 'title', 'description', 'emotions', 'createdAt', 'updatedAt']
-        read_only_fields = ['id', 'createdAt', 'updatedAt']
-        extra_kwargs = {'user': {'write_only': True}}
+        fields = ['id', 'userId', 'date', 'title', 'description', 'emotions', 'createdAt', 'updatedAt']
+        read_only_fields = ['id', 'userId', 'createdAt', 'updatedAt']
+        # extra_kwargs = {'user': {'write_only': True}}
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

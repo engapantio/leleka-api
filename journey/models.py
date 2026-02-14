@@ -1,39 +1,45 @@
 from django.db import models
 
 class WeekData(models.Model):
-    week_number = models.IntegerField(unique=True)
-    days_to_childbirth = models.IntegerField(null=True, blank=True)
-    
+    weekNumber = models.IntegerField(unique=True)
+    daysToChildbirth = models.IntegerField(null=True, blank=True)
+
     # Baby data
-    baby_image = models.URLField()
-    baby_size = models.FloatField()
-    baby_weight = models.FloatField()
-    baby_analogy = models.CharField(max_length=255, blank=True, null=True)
-    baby_activity = models.TextField()
-    baby_development = models.TextField()
-    interesting_fact = models.TextField()
-    mom_daily_tips = models.JSONField(default=list)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    
+    image = models.URLField()
+    babySize = models.FloatField()
+    babyWeight = models.FloatField()
+    analogy = models.CharField(max_length=255, blank=True, null=True)
+    babyActivity = models.TextField()
+    babyDevelopment = models.TextField()
+    interestingFact = models.TextField()
+    momDailyTips = models.JSONField(default=list)
+    sensationDescr = models.TextField(null=True, blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+
     class Meta:
-        ordering = ['week_number']
-    
+        ordering = ['weekNumber']
+
     def __str__(self):
-        return f"Week {self.week_number}"
+        return f"Week {self.weekNumber}"
 
 class MomFeeling(models.Model):
-    week = models.ForeignKey(WeekData, on_delete=models.CASCADE, related_name='mom_feelings')
-    feeling_state = models.CharField(max_length=255)
-    
+    weekNumber = models.ForeignKey(WeekData, on_delete=models.CASCADE, related_name='momFeelings')
+    feelingState = models.CharField(max_length=255)
+
     class Meta:
-        unique_together = ['week', 'feeling_state']
+        # unique_together = ['weekNumber', 'feelingState']
+        constraints = [
+            models.UniqueConstraint(fields=['weekNumber', 'feelingState'], name='unique_week_feeling')
+        ]
 
 
 class ComfortTip(models.Model):
-    week = models.ForeignKey(WeekData, related_name='comfort_tips', on_delete=models.CASCADE)
+    weekNumber = models.ForeignKey(WeekData, related_name='comfortTips', on_delete=models.CASCADE)
     category = models.CharField(max_length=100)
     tip = models.TextField()
-    
+
     class Meta:
-        unique_together = ['week', 'category']
+        # unique_together = ['weekNumber', 'category']
+        constraints = [
+            models.UniqueConstraint(fields=['weekNumber', 'category'], name='unique_week_category')
+        ]

@@ -3,10 +3,11 @@ from rest_framework import serializers
 from .models import Task
 
 class TaskSerializer(serializers.ModelSerializer):
+    userId = serializers.UUIDField(source='user_id', read_only=True)
     class Meta:
         model = Task
-        fields = ['id', 'name', 'date', 'isDone', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['id', 'userId', 'name', 'date', 'isDone', 'createdAt', 'updatedAt']
+        read_only_fields = ['id', 'userId','createdAt', 'updatedAt']
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user

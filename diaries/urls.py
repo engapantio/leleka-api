@@ -6,4 +6,5 @@ urlpatterns = [
     path('diaries/', views.DiaryListCreateView.as_view(), name='diary_list_create'),
     path('diaries/<uuid:entry_id>/', views.diary_detail, name='diary_detail'),
     path('emotions/', views.get_emotions_list, name='emotions_list'),
+    path('emotions/<int:id>/', views.emotion_detail, name='emotion_detail'),
 ]

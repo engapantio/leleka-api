@@ -10,11 +10,11 @@ class Task(models.Model):
     name = models.CharField(max_length=255)
     date = models.CharField(max_length=10, default=date.today())
     isDone = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-createdAt']
         verbose_name_plural = 'Tasks'
 
     def __str__(self):

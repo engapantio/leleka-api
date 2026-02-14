@@ -31,12 +31,18 @@ class TaskListCreateView(ListCreateAPIView):
     serializer_class = TaskSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['date']  # Enables ?date=YYYY-MM-DD filtering
+    pagination_class = None
 
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"tasks": serializer.data})
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
