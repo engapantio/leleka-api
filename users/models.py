@@ -29,7 +29,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     gender = models.CharField(max_length=4, choices=GENDER_CHOICES, null=True, blank=True)
     dueDate = models.DateField(null=True, blank=True)
-    avatarUrl = models.URLField(max_length=500, blank=True, null=True)
+    avatarUrl = models.URLField(max_length=500, default='https://ac.goit.global/fullstack/react/default-avatar.jpg', null=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

@@ -240,9 +240,7 @@ def auth_refresh(request):
     request.session.save()
 
     response = Response({
-        'accessToken': access_token,
-        'refreshToken': refresh_token,
-        'user': {'id': user_id}
+        'success': True
     })
     response.set_cookie('sessionid', request.session.session_key, httponly=True)
     response.set_cookie('accessToken', access_token, max_age=3600, httponly=True, secure=not settings.DEBUG)

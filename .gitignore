@@ -219,4 +219,6 @@ __marimo__/
 staticfiles/
 staticfiles-dist/
 assets/
-!static/  
+!static/
+
+.idea/
